@@ -1,0 +1,26 @@
+<div class="row">
+    <div class="col">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <h1>Available Money : {{availableMoney}} $</h1>
+        <h2>Business Available</h2>
+        <div class="container-fluid">
+            <div class="row">
+                <div *ngFor="let b of businesses;trackBy:trackById;sortBy:sortBusinesses" class="col-2">
+                    <h2>
+                        {{b.name}}
+                    </h2>
+                    <h3>Bought already: {{businessBoughtQuantity(b.id)}}</h3>
+                    <h3>Price: {{b.purchasePrice}} $</h3>
+                    <h3>ROI: {{b.profitsGenerationAmount}} $ each {{b.profitsGenerationTime}} seconds</h3>
+                    <button mat-flat-button class="btn btn-primary" (click)="buy(b.id)" [disabled]="b.purchasePrice>availableMoney">Buy</button>
+                    <button mat-flat-button class="btn btn-primary" (click)="work(b.id)" [disabled]="businessBoughtQuantity(b.id) == 0 || isBusy(b.id)">Work</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
