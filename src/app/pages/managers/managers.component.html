@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div *ngFor="let m of managers;trackBy:trackById;sortBy:sortManagers" class="col-2">
-                    <div class="card" style="width: 18rem;">
+                    <div class="card"  style="width: 18rem;"  [ngClass]="{'bg-success text-light':isManagerContracted(m.id)}">
                         <img class="card-img-top" [attr.src]="m.imageSrc" alt="Card image cap">
                         <div class="card-body">
                           <h3 class="card-title">{{m.name}}</h3>

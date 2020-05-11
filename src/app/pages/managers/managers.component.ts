@@ -33,7 +33,7 @@ export class ManagersComponent implements OnInit {
   }
 
   isManagerContracted(id:number):boolean{
-    return this.gameService.getManagersPurchasedById(id)?false:true;
+    return this.gameService.getManagersPurchasedById(id)?true:false;
   }
 
   get availableMoney():number{

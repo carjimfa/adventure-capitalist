@@ -162,6 +162,16 @@ export class GameService {
     localStorage.setItem("game", JSON.stringify(saveDto));
   }
 
+  resetGame(){
+    this.businesses.forEach(element=>{
+      element.workingNotifier.next(0);
+    });
+    this.managersPurchased=new Array<Manager>();
+    this.businessesPurchased=new Array<UserBusiness>();
+    this.userMoney=10;
+    localStorage.removeItem("game");
+  }
+
   loadGame(){
     if(this.loaded){
       return;
@@ -205,8 +215,9 @@ export class GameService {
         let generatedMoney = workUnitsMissed * element.quantity * business.profitsGenerationAmount;
         this.userMoney += generatedMoney;
       }
-      let timeDifference = Math.ceil(secondsDifference % business.profitsGenerationTime);
-      element.remainingTime = timeDifference * 1000;
+      else{
+        element.remainingTime-=miliSecondsDifference;
+      }
       this.work(business.id);
     });
   }
@@ -287,7 +298,6 @@ export class GameService {
     }
     return -1;
   }
-
 
   isBusy(id:number){
     let businessPurchased=this.getBusinessPurchasedById(id);
@@ -376,7 +386,6 @@ export class GameService {
         }
       })).subscribe();
   }
-
 
   public getBusinessById(busniessId: number):Business {
     if(this.businesses.length==0){
