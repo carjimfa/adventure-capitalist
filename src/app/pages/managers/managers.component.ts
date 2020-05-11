@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { GameService } from 'src/app/services/game.service';
+import { Manager } from 'src/app/models/manager';
+import { Business } from 'src/app/models/business';
 
 @Component({
   selector: 'app-managers',
@@ -7,9 +10,40 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ManagersComponent implements OnInit {
 
-  constructor() { }
+  constructor(private gameService:GameService) { }
 
   ngOnInit(): void {
+    if(this.managers.length==0){
+      this.gameService.seedManagers();
+    }
+    if(this.gameService.businesses.length==0){
+      this.gameService.seedBusiness();
+    }
+  }
+
+  get managers():Manager[]{
+    return this.gameService.managers.sort(this.gameService.sortManagers);
+  }
+
+  trackById(index, item:Manager){
+    return item.id; 
+  }
+
+  buy(id:number){
+    this.gameService.buyManager(id);
+  }
+
+  isManageravailable(id:number):boolean{
+    return this.gameService.isManagerAvailable(id);
+  }
+
+  get availableMoney():number{
+    return this.gameService.userMoney;
+  }
+
+  businessName(businessId:number):string{
+    var b=this.gameService.getBusinessById(businessId);
+    return b?b.name:"NA";
   }
 
 }

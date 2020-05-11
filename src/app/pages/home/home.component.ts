@@ -9,9 +9,9 @@ import { Business } from 'src/app/models/business';
 })
 export class HomeComponent implements OnInit {
 
-
-
   constructor(private gameService:GameService) { }
+
+  quantity:string="1";
 
   ngOnInit(): void {
     if(this.businesses.length==0){
@@ -23,11 +23,11 @@ export class HomeComponent implements OnInit {
     return this.gameService.businesses.sort(this.gameService.sortBusinesses);
   }
 
-  isBusy(id:number){
+  isBusy(id:number):boolean{
     return this.gameService.isBusy(id);
   }
 
-  trackById(index, item:Business){
+  trackById(index, item:Business):number{
     return item.id; 
   }
 
@@ -35,16 +35,44 @@ export class HomeComponent implements OnInit {
     return this.gameService.userMoney;
   }
 
-  buy(id:number){
-    this.gameService.buyBusinessUnit(id, 1);
+  get availableMoneyFormated():string{
+    return this.gameService.formatCurrency(this.gameService.userMoney);
   }
 
-  work(id:number){
+  isBuyAvailable(id:number):boolean{
+    return this.gameService.isBuyAvailable(id, parseInt(this.quantity));
+  }
+
+  isWorkAvailable(id:number):boolean{
+    return this.gameService.isWorkAvailable(id);
+  }
+
+  remainingTime(id:number):number{
+    return this.gameService.remainingTime(id);
+  }
+
+  isAutomatized(id:number):boolean{
+    return this.gameService.isAutomatized(id);
+  }
+
+  buy(id:number):void{
+    this.gameService.buyBusinessUnit(id,  parseInt(this.quantity));
+  }
+
+  price(id:number):string{
+    return this.gameService.formatCurrency(this.gameService.price(id, parseInt(this.quantity)));
+  }
+
+  benefits(id:number):string{
+    return this.gameService.formatCurrency(this.gameService.benefits(id));
+  }
+
+  work(id:number):void{
     this.gameService.work(id);
   }
 
   businessBoughtQuantity(id:number):number{
-    return this.gameService.getBusinessPurchasedById(id)?this.gameService.getBusinessPurchasedById(id).quantity:0;
+    return this.gameService.businessBoughtQuantity(id);
   }
 
 

@@ -1,12 +1,15 @@
-<div class="row">
+<div class="row white-bg">
     <div class="col">
-    </div>
-</div>
-
-<div class="row">
-    <div class="col">
-        <h1>Available Money : {{availableMoney}} $</h1>
+        <h1>Available Money : {{availableMoneyFormated}}</h1>
         <h2>Business Available</h2>
+        <mat-form-field>
+        <mat-label>Select an option</mat-label>
+            <mat-select [(value)]="quantity">
+                <mat-option value="1">1</mat-option>
+                <mat-option value="10">10</mat-option>
+                <mat-option value="100">100</mat-option>
+            </mat-select>
+        </mat-form-field>
         <div class="container-fluid">
             <div class="row">
                 <div *ngFor="let b of businesses;trackBy:trackById;sortBy:sortBusinesses" class="col-2">
@@ -14,13 +17,11 @@
                         {{b.name}}
                     </h2>
                     <h3>Bought already: {{businessBoughtQuantity(b.id)}}</h3>
-                    <h3>Price: {{b.purchasePrice}} $</h3>
-                    <h3>ROI: {{b.profitsGenerationAmount}} $ each {{b.profitsGenerationTime}} seconds</h3>
-                    <h3><button mat-flat-button class="btn btn-primary btn-block" (click)="buy(b.id)" [disabled]="b.purchasePrice>availableMoney">Buy</button></h3>
-                    <h3><button mat-flat-button class="btn btn-success btn-block" (click)="work(b.id)" [disabled]="businessBoughtQuantity(b.id) == 0 || isBusy(b.id)">Work</button></h3>
+                    <h3>ROI: {{benefits(b.id)}} $ each {{b.profitsGenerationTime}} seconds</h3>
+                    <h3><button mat-flat-button class="btn btn-primary btn-block" (click)="buy(b.id)" [disabled]="!isBuyAvailable(b.id)">Buy ({{price(b.id)}})</button></h3>
+                    <h3><button mat-flat-button class="btn btn-success btn-block" (click)="work(b.id)" [disabled]="!isWorkAvailable(b.id)"><span *ngIf="!isBusy(b.id)">Work</span><span *ngIf="isBusy(b.id)">{{(remainingTime(b.id)/1000)}}</span></button></h3>
                 </div>
             </div>
         </div>
-        
     </div>
 </div>

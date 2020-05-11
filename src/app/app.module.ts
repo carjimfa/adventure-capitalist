@@ -10,6 +10,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { MatButtonModule} from '@angular/material/button';
 import { ManagersComponent } from './pages/managers/managers.component';
 import { PowerUpsComponent } from './pages/power-ups/power-ups.component';
+import {MatSelectModule} from '@angular/material/select'; 
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { PowerUpsComponent } from './pages/power-ups/power-ups.component';
     AppRoutingModule,
     NgbModule,
     BrowserAnimationsModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]
