@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { takeUntil, map } from 'rxjs/operators';
-import { Subject, Observable, timer, interval, pipe } from 'rxjs';
+import { takeUntil, map, timeout, timeInterval, switchMap, takeWhile } from 'rxjs/operators';
+import { Subject, Observable, timer, interval, pipe, BehaviorSubject, NEVER } from 'rxjs';
 import { Business } from '../models/business';
 import { UserBusiness } from '../models/user-business';
 import { BusinessPurchasedNotification } from '../models/business-purchased-notification';
@@ -14,6 +14,7 @@ export class GameService {
   businessesPurchased:Array<UserBusiness>=new Array<UserBusiness>();
   businesses:Array<Business>=new Array<Business>();
   busyBusiness:Array<UserBusiness>=new Array<UserBusiness>();
+  workingStops:Subject<number>=new Subject<number>();
 
   //TODO: Working Business Units right Now
 
@@ -31,7 +32,8 @@ export class GameService {
         profitsGenerationAmount:1,
         profitsGenerationTime:0,
         purchasePrice:1,
-        purchasePriceMultiplier:1
+        purchasePriceMultiplier:1,
+        workingNotifier:new Subject<number>()
       }),
       new Business({
         id:1,
@@ -39,39 +41,62 @@ export class GameService {
         profitsGenerationAmount:50000,
         profitsGenerationTime:90,
         purchasePrice:25000,
-        purchasePriceMultiplier:1.3
+        purchasePriceMultiplier:1.3,
+        workingNotifier:new Subject<number>()
       }),
       new Business({
         id:2,
         name:"Coffee Supermarket Stand",
-        profitsGenerationAmount:500,
+        profitsGenerationAmount:20,
         profitsGenerationTime:10,
         purchasePrice:100,
-        purchasePriceMultiplier:1.5
+        purchasePriceMultiplier:1.5,
+        workingNotifier:new Subject<number>()
       }),
       new Business({
         id:3,
         name:"Newspaper Street Stand",
-        profitsGenerationAmount:450,
+        profitsGenerationAmount:150,
         profitsGenerationTime:75,
         purchasePrice:750,
-        purchasePriceMultiplier:1.6
+        purchasePriceMultiplier:1.6,
+        workingNotifier:new Subject<number>()
       }),
       new Business({
         id:4,
         name:"Pub",
         profitsGenerationAmount:12000,
         profitsGenerationTime:120,
-        purchasePrice:5000,
-        purchasePriceMultiplier:1.3
+        purchasePrice:2000,
+        purchasePriceMultiplier:1.3,
+        workingNotifier:new Subject<number>()
       }),
       new Business({
         id:5,
         name:"Vegan Sandwiches Cafe",
-        profitsGenerationAmount:75000,
+        profitsGenerationAmount:14250,
         profitsGenerationTime:500,
+        purchasePrice:140000,
+        purchasePriceMultiplier:1.5,
+        workingNotifier:new Subject<number>()
+      }),
+      new Business({
+        id:6,
+        name:"Coworking",
+        profitsGenerationAmount:17500,
+        profitsGenerationTime:530,
         purchasePrice:150000,
-        purchasePriceMultiplier:1.5
+        purchasePriceMultiplier:1.5,
+        workingNotifier:new Subject<number>()
+      }),
+      new Business({
+        id:7,
+        name:"Train Company",
+        profitsGenerationAmount:1750000,
+        profitsGenerationTime:1800,
+        purchasePrice:150000000,
+        purchasePriceMultiplier:1.5,
+        workingNotifier:new Subject<number>()
       })
     );
   }
@@ -107,60 +132,53 @@ export class GameService {
         businessId:busniessId,
         quantity:quantity,
         busy:false,
-        remainingTime:newBusiness.profitsGenerationTime
+        remainingTime:newBusiness.profitsGenerationTime*1000
       }));
     }
     this.userMoney=this.userMoney-price;
     this.gamePurchaseUpdates.next(new BusinessPurchasedNotification({businessId:busniessId, quantity:quantity}));
   }
 
+  // work(businessId:number):Observable<any>{
+  //   let response=new Observable<boolean>(observer=>{
+  //     let businessPurchased=this.getBusinessPurchasedById(businessId);
+  //     if(!businessPurchased){
+  //       return;
+  //     }
+  //     let business=this.getBusinessById(businessPurchased.businessId);
+  //     businessPurchased.busy=true;
+  //     timer(business.profitsGenerationTime*1000).subscribe((r)=>{
+  //       this.userMoney+=businessPurchased.quantity*business.profitsGenerationAmount;
+  //       observer.next(true);
+  //       businessPurchased.busy=false;
+  //     })  
+  //   });
+  //   return response;
+  // }
+
   work(businessId:number):Observable<any>{
-    // let response=new Observable<boolean>(observer=>{
-    //   let businessPurchased=this.getBusinessPurchasedById(businessId);
-    //   if(!businessPurchased){
-    //     return;
-    //   }
-    //   let business=this.getBusinessById(businessPurchased.businessId);
-    //   businessPurchased.busy=true;
-      
-    //   timer(business.profitsGenerationTime*1000).subscribe((r)=>{
-    //     this.userMoney+=businessPurchased.quantity*business.profitsGenerationAmount;
-    //     observer.next(true);
-    //     observer.complete();
-    //     businessPurchased.busy=false;
-    //   })
-    // });
-    // return response;
-    let response=new Observable<boolean>(observer=>{
-      let businessPurchased=this.getBusinessPurchasedById(businessId);
-      if(!businessPurchased){
-        return;
-      }
-      let business=this.getBusinessById(businessPurchased.businessId);
-      businessPurchased.busy=true;
-      let timer=setTimeout(()=>{
-        if(businessPurchased.remainingTime==0){
+    let businessPurchased=this.getBusinessPurchasedById(businessId);
+    if(!businessPurchased){
+      return;
+    }
+    let business=this.getBusinessById(businessPurchased.businessId);
+    businessPurchased.busy=true;
+    var timer=interval(100);
+    timer.pipe(
+      takeUntil(business.workingNotifier),
+      map((r)=>{
+        if(businessPurchased.remainingTime<=0){
           this.userMoney+=businessPurchased.quantity*business.profitsGenerationAmount;
           businessPurchased.busy=false;
-          observer.next(true);
-          observer.complete();
-          console.log("COMPLETED WORK");
+          businessPurchased.remainingTime=business.profitsGenerationTime*1000;
+          business.workingNotifier.next(1);
         }
         else{
-          observer.next(false);
           businessPurchased.remainingTime-=100;
-          console.log("TIMER");
         }
-      },1000);
-      // timer(business.profitsGenerationTime*1000).subscribe((r)=>{
-      //   this.userMoney+=businessPurchased.quantity*business.profitsGenerationAmount;
-      //   observer.next(true);
-      //   observer.complete();
-      //   businessPurchased.busy=false;
-      // })
-    });
-    return response;
+      })).subscribe();
   }
+
 
   public getBusinessById(busniessId: number) {
     return this.businesses.filter(b => b.id == busniessId)[0];

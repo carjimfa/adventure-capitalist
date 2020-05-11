@@ -40,7 +40,7 @@ export class HomeComponent implements OnInit {
   }
 
   work(id:number){
-    this.gameService.work(id).subscribe();
+    this.gameService.work(id);
   }
 
   businessBoughtQuantity(id:number):number{

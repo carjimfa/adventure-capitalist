@@ -1,3 +1,5 @@
+import { Subject } from 'rxjs';
+
 export interface IBusiness{
     id:number;
     name:string;
@@ -5,6 +7,7 @@ export interface IBusiness{
     profitsGenerationAmount:number;
     purchasePrice:number;
     purchasePriceMultiplier:number;
+    workingNotifier:Subject<number>;
 }
 
 export class Business implements IBusiness {
@@ -14,6 +17,7 @@ export class Business implements IBusiness {
     profitsGenerationAmount:number;
     purchasePrice:number;
     purchasePriceMultiplier:number;
+    workingNotifier:Subject<number>;
 
     constructor(data?: IBusiness) {
         if (data) {

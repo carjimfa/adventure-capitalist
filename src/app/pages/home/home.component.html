@@ -16,8 +16,8 @@
                     <h3>Bought already: {{businessBoughtQuantity(b.id)}}</h3>
                     <h3>Price: {{b.purchasePrice}} $</h3>
                     <h3>ROI: {{b.profitsGenerationAmount}} $ each {{b.profitsGenerationTime}} seconds</h3>
-                    <button mat-flat-button class="btn btn-primary" (click)="buy(b.id)" [disabled]="b.purchasePrice>availableMoney">Buy</button>
-                    <button mat-flat-button class="btn btn-primary" (click)="work(b.id)" [disabled]="businessBoughtQuantity(b.id) == 0 || isBusy(b.id)">Work</button>
+                    <h3><button mat-flat-button class="btn btn-primary btn-block" (click)="buy(b.id)" [disabled]="b.purchasePrice>availableMoney">Buy</button></h3>
+                    <h3><button mat-flat-button class="btn btn-success btn-block" (click)="work(b.id)" [disabled]="businessBoughtQuantity(b.id) == 0 || isBusy(b.id)">Work</button></h3>
                 </div>
             </div>
         </div>
