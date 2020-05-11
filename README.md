@@ -47,11 +47,15 @@ I've used Intervals and Observables Notifications to clear them. In the beginnin
 
 UserBusiness maintains the state for each purchased business such as: quantity, remaining time to provide benefits, if it is automatized or not... using singletons simplifies data ceralization as having everything in a single point improves code reusability and data access: everything is a reference so that was an advantage.
 
-I used localstorage to maintain state when you close the window and works fine. I had a few troubles loading the game again but finally is working fine. 
+I used localstorage to maintain state when you close the window and it works fine. I had a few troubles loading the game again but finally is working and it doesn't adds a couple of billions each time you press F5. 
+
+I focused on the engine behind the work functionality. I wanted it to be an interval with control to make decisions for each iteration, to have control in a granularized portion of the entire work. I didn't want it to be a simple state-machine "Work->Earn->Work" but I wanted to have control over the entire work process, I mean, I wanted to be able to control the work process of long-awaited operations, and that's why I'm using intervals.
+
+With simple timers or bigger intervals, saving/loading logic wouldn't be possible because I can't know how much time has passed since I started this 1600 seconds task. Control, that's why. 
 
 ### Improvements
 
-The code structure is bad, very bad. GameService should be splitted in 3 different service (just for a start) with ManagerService and BusinessService. Angular CLI allows to build everything fast and pretty but even with it refactor is on your own so there are a lot of improvements to this code that should be made in order to improve scalability. Of course I had only the weekend to complete the code and Monday, so I focused on the main functionalities: businesses, managers and saving/loading logic. 
+The code structure is bad, very bad. GameService should be splitted in 3 different service (as a starting point) with ManagerService and BusinessService. Angular CLI allows to build everything fast and pretty but even with it refactor is on your own so there are a lot of improvements to this code that should be made in order to improve scalability. Of course I had only the weekend to complete the code and Monday, so I focused on the main functionalities: businesses, managers and saving/loading logic. 
 
 I wanted to add power-ups (it would have been very easy) but couldn't do it, also a backend should be there to persist everything, but this is just a MVC and Angular with a couple of seeding methods makes the magic. That seeding methods should be moved to another part in case no backend is provided, to a seed functions under their own service but, it's just an MVP. 
 
@@ -76,8 +80,4 @@ When you buy a Business for the first time, you are buying it in 'manual mode'. 
 ### Saving / Loading
 
 For the Save functionality im saving all the `purchasedBusinesses`, `purchasedManagers` and `userMoney` in localStorage along with a Date. When I start the app I try to load this data and continue from the moment it stopped. Save is called by every interval when `remainingTime` is 0.
-
-
-## Further help
-
 
