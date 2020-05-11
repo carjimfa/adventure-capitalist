@@ -14,9 +14,7 @@ export class HomeComponent implements OnInit {
   quantity:string="1";
 
   ngOnInit(): void {
-    if(this.businesses.length==0){
-      this.gameService.seedBusiness();
-    }
+    this.gameService.loadGame();
   }
 
   get businesses():Business[]{

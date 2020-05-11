@@ -10,7 +10,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { MatButtonModule} from '@angular/material/button';
 import { ManagersComponent } from './pages/managers/managers.component';
 import { PowerUpsComponent } from './pages/power-ups/power-ups.component';
-import {MatSelectModule} from '@angular/material/select'; 
+import {MatSelectModule} from '@angular/material/select';
+import { AvailableMoneyComponent } from './components/available-money/available-money.component'; 
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import {MatSelectModule} from '@angular/material/select';
     HomeComponent,
     NavbarComponent,
     ManagersComponent,
-    PowerUpsComponent
+    PowerUpsComponent,
+    AvailableMoneyComponent
   ],
   imports: [
     BrowserModule,

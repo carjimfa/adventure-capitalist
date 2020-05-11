@@ -13,12 +13,7 @@ export class ManagersComponent implements OnInit {
   constructor(private gameService:GameService) { }
 
   ngOnInit(): void {
-    if(this.managers.length==0){
-      this.gameService.seedManagers();
-    }
-    if(this.gameService.businesses.length==0){
-      this.gameService.seedBusiness();
-    }
+    this.gameService.loadGame();
   }
 
   get managers():Manager[]{
@@ -35,6 +30,10 @@ export class ManagersComponent implements OnInit {
 
   isManageravailable(id:number):boolean{
     return this.gameService.isManagerAvailable(id);
+  }
+
+  isManagerContracted(id:number):boolean{
+    return this.gameService.getManagersPurchasedById(id)?false:true;
   }
 
   get availableMoney():number{

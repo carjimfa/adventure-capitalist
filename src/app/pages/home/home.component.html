@@ -1,9 +1,9 @@
 <div class="row white-bg">
     <div class="col">
-        <h1>Available Money : {{availableMoneyFormated}}</h1>
+        <app-available-money></app-available-money>
         <h2>Business Available</h2>
         <mat-form-field>
-        <mat-label>Select an option</mat-label>
+        <mat-label>Buying Multiplier</mat-label>
             <mat-select [(value)]="quantity">
                 <mat-option value="1">1</mat-option>
                 <mat-option value="10">10</mat-option>

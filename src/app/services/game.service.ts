@@ -6,6 +6,7 @@ import { UserBusiness } from '../models/user-business';
 import { BusinessPurchasedNotification } from '../models/business-purchased-notification';
 import { ObserversModule } from '@angular/cdk/observers';
 import { Manager } from '../models/manager';
+import { SaveDto } from '../models/savedto';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ export class GameService {
   //TODO: Working Business Units right Now
 
   userMoney:number=10;
-
+  loaded:boolean=false;
   constructor() { 
     
   }
@@ -137,7 +138,7 @@ export class GameService {
       new Manager({
         businessId:6,
         id:6,
-        name:"Martha Lynch",
+        name:"David Spencer",
         purchasePrice:1500000,
         imageSrc:"./assets/girl-4.jpg"
       }),
@@ -149,6 +150,65 @@ export class GameService {
         imageSrc:"./assets/girl-5.jpg"
       })
       );
+  }
+
+  saveGame(){
+    let saveDto=new SaveDto({
+      userMoney:this.userMoney,
+      purchasedBusinesses:this.businessesPurchased,
+      purchasedManagers:this.managersPurchased,
+      saveDate:new Date(Date.now())
+    });
+    localStorage.setItem("game", JSON.stringify(saveDto));
+  }
+
+  loadGame(){
+    if(this.loaded){
+      return;
+    }
+    this.seedManagers();
+    this.seedBusiness();
+    let saveDtoRaw=localStorage.getItem("game");
+    if(saveDtoRaw){
+      let savedGame:SaveDto=new SaveDto(JSON.parse(saveDtoRaw));
+      this.managersPurchased=savedGame.purchasedManagers;
+      this.businessesPurchased=savedGame.purchasedBusinesses;
+      this.userMoney=savedGame.userMoney;
+      let miliSecondsDifference=(Math.ceil(new Date(Date.now()).getTime()-new Date(savedGame.saveDate).getTime()));
+      let secondsDifference=miliSecondsDifference/1000;
+      this.loadAutomatizedBusinesses(miliSecondsDifference, secondsDifference);
+      this.loadNonAutomatizedBusinesses(secondsDifference);
+    }
+    this.loaded=true;
+  }
+
+  private loadNonAutomatizedBusinesses(secondsDifference: number) {
+    this.businessesPurchased.filter(b => !b.automatized).forEach(element => {
+      let business = this.getBusinessById(element.businessId);
+      if (secondsDifference > element.remainingTime) {
+        element.remainingTime = 0;
+        let generatedMoney = element.quantity * business.profitsGenerationAmount;
+        this.userMoney += generatedMoney;
+      }
+      else {
+        element.remainingTime = element.remainingTime - secondsDifference;
+      }
+      this.work(element.businessId);
+    });
+  }
+
+  private loadAutomatizedBusinesses(miliSecondsDifference: number, secondsDifference: number) {
+    this.businessesPurchased.filter(b => b.automatized).forEach(element => {
+      let business = this.getBusinessById(element.businessId);
+      if (miliSecondsDifference > element.remainingTime) {
+        let workUnitsMissed = (Math.floor(secondsDifference / business.profitsGenerationTime));
+        let generatedMoney = workUnitsMissed * element.quantity * business.profitsGenerationAmount;
+        this.userMoney += generatedMoney;
+      }
+      let timeDifference = Math.ceil(secondsDifference % business.profitsGenerationTime);
+      element.remainingTime = timeDifference * 1000;
+      this.work(business.id);
+    });
   }
 
   formatCurrency(amount:number){
@@ -291,23 +351,6 @@ export class GameService {
     return this.getManagersPurchasedById(id)?false:true;
   }
 
-  // work(businessId:number):Observable<any>{
-  //   let response=new Observable<boolean>(observer=>{
-  //     let businessPurchased=this.getBusinessPurchasedById(businessId);
-  //     if(!businessPurchased){
-  //       return;
-  //     }
-  //     let business=this.getBusinessById(businessPurchased.businessId);
-  //     businessPurchased.busy=true;
-  //     timer(business.profitsGenerationTime*1000).subscribe((r)=>{
-  //       this.userMoney+=businessPurchased.quantity*business.profitsGenerationAmount;
-  //       observer.next(true);
-  //       businessPurchased.busy=false;
-  //     })  
-  //   });
-  //   return response;
-  // }
-
   work(businessId:number):Observable<any>{
     let businessPurchased=this.getBusinessPurchasedById(businessId);
     if(!businessPurchased){
@@ -326,6 +369,7 @@ export class GameService {
             businessPurchased.busy=false;
             business.workingNotifier.next(1);
           }
+          this.saveGame();
         }
         else{
           businessPurchased.remainingTime-=100;
