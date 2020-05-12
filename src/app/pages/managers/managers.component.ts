@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { GameService } from 'src/app/services/game.service';
 import { Manager } from 'src/app/models/manager';
 import { Business } from 'src/app/models/business';
+import { ManagersService } from 'src/app/services/managers.service';
+import { UserService } from 'src/app/services/user.service';
+import { BusinessesService } from 'src/app/services/businesses.service';
 
 @Component({
   selector: 'app-managers',
@@ -10,14 +13,17 @@ import { Business } from 'src/app/models/business';
 })
 export class ManagersComponent implements OnInit {
 
-  constructor(private gameService:GameService) { }
+  constructor(private managersService:ManagersService,
+    private gameService:GameService,
+    private userService:UserService,
+    private businessesService:BusinessesService) { }
 
   ngOnInit(): void {
     this.gameService.loadGame();
   }
 
   get managers():Manager[]{
-    return this.gameService.managers.sort(this.gameService.sortManagers);
+    return this.managersService.managers.sort(this.managersService.sortManagers);
   }
 
   trackById(index, item:Manager){
@@ -25,23 +31,23 @@ export class ManagersComponent implements OnInit {
   }
 
   buy(id:number){
-    this.gameService.buyManager(id);
+    this.managersService.buyManager(id);
   }
 
   isManageravailable(id:number):boolean{
-    return this.gameService.isManagerAvailable(id);
+    return this.managersService.isManagerAvailable(id);
   }
 
   isManagerContracted(id:number):boolean{
-    return this.gameService.getManagersPurchasedById(id)?true:false;
+    return this.managersService.getManagersPurchasedById(id)?true:false;
   }
 
   get availableMoney():number{
-    return this.gameService.userMoney;
+    return this.userService.userMoney;
   }
 
   businessName(businessId:number):string{
-    var b=this.gameService.getBusinessById(businessId);
+    var b=this.businessesService.getBusinessById(businessId);
     return b?b.name:"NA";
   }
 

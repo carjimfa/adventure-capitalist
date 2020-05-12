@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { GameService } from 'src/app/services/game.service';
 import { Business } from 'src/app/models/business';
+import { BusinessesService } from 'src/app/services/businesses.service';
+import { UserService } from 'src/app/services/user.service';
+import { CurrencyService } from 'src/app/services/currency.service';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +12,10 @@ import { Business } from 'src/app/models/business';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(private gameService:GameService) { }
+  constructor(private businessesService:BusinessesService,
+    private gameService:GameService,
+    private userService:UserService,
+    private currencyService:CurrencyService) { }
 
   quantity:string="1";
 
@@ -18,11 +24,11 @@ export class HomeComponent implements OnInit {
   }
 
   get businesses():Business[]{
-    return this.gameService.businesses.sort(this.gameService.sortBusinesses);
+    return this.businessesService.businesses.sort(this.businessesService.sortBusinesses);
   }
 
   isBusy(id:number):boolean{
-    return this.gameService.isBusy(id);
+    return this.businessesService.isBusy(id);
   }
 
   trackById(index, item:Business):number{
@@ -30,39 +36,35 @@ export class HomeComponent implements OnInit {
   }
 
   get availableMoney():number{
-    return this.gameService.userMoney;
-  }
-
-  get availableMoneyFormated():string{
-    return this.gameService.formatCurrency(this.gameService.userMoney);
+    return this.userService.userMoney;
   }
 
   isBuyAvailable(id:number):boolean{
-    return this.gameService.isBuyAvailable(id, parseInt(this.quantity));
+    return this.businessesService.isBuyAvailable(id, parseInt(this.quantity));
   }
 
   isWorkAvailable(id:number):boolean{
-    return this.gameService.isWorkAvailable(id);
+    return this.businessesService.isWorkAvailable(id);
   }
 
   remainingTime(id:number):number{
-    return this.gameService.remainingTime(id);
+    return this.businessesService.remainingTime(id);
   }
 
   isAutomatized(id:number):boolean{
-    return this.gameService.isAutomatized(id);
+    return this.businessesService.isAutomatized(id);
   }
 
   buy(id:number):void{
-    this.gameService.buyBusinessUnit(id,  parseInt(this.quantity));
+    this.businessesService.buyBusinessUnit(id,  parseInt(this.quantity));
   }
 
   price(id:number):string{
-    return this.gameService.formatCurrency(this.gameService.price(id, parseInt(this.quantity)));
+    return this.currencyService.formatCurrency(this.businessesService.price(id, parseInt(this.quantity)));
   }
 
   benefits(id:number):string{
-    return this.gameService.formatCurrency(this.gameService.benefits(id));
+    return this.currencyService.formatCurrency(this.businessesService.benefits(id));
   }
 
   work(id:number):void{
@@ -70,7 +72,7 @@ export class HomeComponent implements OnInit {
   }
 
   businessBoughtQuantity(id:number):number{
-    return this.gameService.businessBoughtQuantity(id);
+    return this.businessesService.businessBoughtQuantity(id);
   }
 
 
