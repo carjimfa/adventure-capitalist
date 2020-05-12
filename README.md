@@ -29,9 +29,9 @@ In this game you're comitted to earn as much money as you can. You start with on
 
 ### Businesses
 
-By default you have only 8 business types to buy, but they're configurable in the GameService.ts, where seeding happens. You can add/edit as much businesses as you want.
+By default you have only 8 business types to buy, but they're configurable in the `BusinessesService.ts`, where seeding happens. You can add/edit as much businesses as you want.
 
-Businesses have a cost but you can buy as much items of a business type as you want. You can manage to have thousands of vegan restaurants or hundreds of train companies.
+Businesses have a cost but you can buy as much items of a business type as you want or can. You can manage to have thousands of vegan restaurants or hundreds of train companies. The benefits will be multiplied.
 
 ### Managers
 
@@ -41,35 +41,39 @@ Managers, as its name indicates, manage the business for you, so whenever you co
 
 Each business has a time to generate benefits and an amount of benefits per business item. Of course, you can buy as much items of a single business as you want, multiplying the benefits. 
 
-## Game general structure
+If you don't have a Business type purchased, you won't be able to purchase a manager for that kind of business.
 
-The game is built entirely in Angular version 9.0.2 with bootstrap as UI. The game consists on a simple MVC app with a single service that serves everything with singleton objects to maintain data consistency. 
+## Game general structure and solving
+
+The game is built entirely in Angular version 9.0.2 with bootstrap as UI. The game consists on a simple MVC app with services that serve everything with singleton objects to maintain data consistency. 
 
 I've used Intervals and Observables Notifications to clear them. In the beginning I planned to use a turn-based engine but it wasn't as fast as this approach. I used `timer` in a first version, but the `remainingTime` was impossible to get and it would have required additional intervals only to check the remaining time to complete a task so I decided to go on with the interval approach and general game-state for each userBusiness.
 
 UserBusiness maintains the state for each purchased business such as: quantity, remaining time to provide benefits, if it is automatized or not... using singletons simplifies data ceralization as having everything in a single point improves code reusability and data access: everything is a reference so that was an advantage.
 
-I used localstorage to maintain state when you close the window and it works fine. I had a few troubles loading the game again but finally is working and it doesn't adds a couple of billions each time you press F5. 
+I used localstorage to maintain state when you close the window and it works fine. I had a few troubles loading the game again but finally is working and it doesn't add a couple of billions each time you press F5. 
 
-I focused on the engine behind the work functionality. I wanted it to be an interval with control to make decisions for each iteration, to have control in a granularized portion of the entire work. I didn't want it to be a simple state-machine "Work->Earn->Work" but I wanted to have control over the entire work process, I mean, I wanted to be able to control the work process of long-awaited operations, and that's why I'm using intervals.
+I focused on the engine behind the work functionality. I wanted it to be an interval with control to make decisions for each iteration, to have control in a granularized portion of the entire work. I didn't want it to be a simple state-machine "Work->Earn->Work" but I wanted to have control over the entire work process, I mean, I wanted to be able to control the work process of long-awaited operations, and that's why I'm using intervals of 1 second and a counter instead of a single interval to complete the whole working process.
 
-With simple timers or bigger intervals, saving/loading logic wouldn't be possible because I can't know how much time has passed since I started this 1600 seconds task. Control, that's why. 
+With simple timers or bigger intervals, saving/loading logic wouldn't be possible because I can't know how much time has passed since I started a 1600 seconds task, for instance.
 
 ### Improvements
 
-The code structure is bad, very bad. GameService should be splitted in 3 different service (as a starting point) with ManagerService and BusinessService. Angular CLI allows to build everything fast and pretty but even with it refactor is on your own so there are a lot of improvements to this code that should be made in order to improve scalability. Of course I had only the weekend to complete the code and Monday, so I focused on the main functionalities: businesses, managers and saving/loading logic. 
-
-I wanted to add power-ups (it would have been very easy) but couldn't do it, also a backend should be there to persist everything, but this is just a MVC and Angular with a couple of seeding methods makes the magic. That seeding methods should be moved to another part in case no backend is provided, to a seed functions under their own service but, it's just an MVP. 
+I focused on the main functionalities: businesses, managers and saving/loading logic. I wanted to add power-ups but couldn't do it.
 
 Notifications could also be possible, with modals or bootstrap alerts very easy because we can have an observable in the userMoney or in the Buy button so when you reach 100 coworking you can have a prize or something.
 
+A backend with users and persited data would be great also but it would require a lot of additional work.
+
 ### Starting the game
 
-In the beginning GameService builds the application seeding the data from the businesses and the Managers. We'll have an `array` of Businesses full with businesses, an array of Managers full of managers and an empty array of UserBusiness (the object connecting a business and ourselves). 
+In the beginning GameService builds the application seeding the data from the BusinessesService and the ManagersService. We'll have an `array` of Businesses full with businesses, an array of Managers full of managers and an empty array of UserBusiness (the object connecting a business and ourselves). 
+
+The GameService will try to load the saved game if there is one, if there isn't, you'll start with 10$ and no purchased businesses.
 
 ### Buying
 
-When we buy a business, we are creating an object UserManager and adding it to the array os `purchasedBusinesses` in GameService. This object will have `quantity`, `isAutomatized` and `remainingTime` attributes, very important to the correct functioning of the game. `quantity` is the number of items of a business type we have bought, `isAutomatized` tells us if the business has a manager attached to it and `remainingTime` is the remainingTime of the current working iteration that needs to be cleared to give benefits. Right after we buy a business item, work button is setted as available and we can start working with it.
+When we buy a business, we are creating an object UserManager and adding it to the array os `purchasedBusinesses` in BussinessesService. This object will have `quantity`, `isAutomatized` and `remainingTime` attributes, very important to the correct functioning of the game. `quantity` is the number of items of a business type we have bought, `isAutomatized` tells us if the business has a manager attached to it and `remainingTime` is the remainingTime of the current working iteration that needs to be cleared to give benefits. Right after we buy a business item, work button is setted as available and we can start working with it.
 
 ### Working
 
