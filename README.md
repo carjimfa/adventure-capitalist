@@ -21,6 +21,8 @@ Run
 npm run start
 ```
 
+Visit http://localhost:4200 to play!!
+
 ## Game
 
 In this game you're comitted to earn as much money as you can. You start with only 10$ and you have to start both working and buying new work force to build your empire. 
